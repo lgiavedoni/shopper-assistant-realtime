@@ -132,10 +132,9 @@ You will have tools, use them. Think of your main actions as PLP, PDF, Add to Ca
       // Append new server events to the list
       dataChannel.addEventListener("message", (e) => {
         const newEvent = JSON.parse(e.data);
-        // console.log("Received event:", newEvent);  // Debug log
+        console.log("Received new event:", newEvent); // Debug log
         
         setEvents((prev) => {
-          // Ensure we're not duplicating events
           const eventExists = prev.some(event => 
             event.event_id === newEvent.event_id
           );
@@ -165,7 +164,7 @@ You will have tools, use them. Think of your main actions as PLP, PDF, Add to Ca
       <main className="flex flex-col">
         <SessionProvider sendClientEvent={sendClientEvent}>
           {/* Session Controls at the top */}
-          <section className="h-32 p-4">
+          <section className="h-48 p-4">
             <SessionControls
               startSession={startSession}
               stopSession={stopSession}
