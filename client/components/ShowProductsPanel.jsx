@@ -1,6 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useFunctionCall } from '../hooks/useFunctionCall';
 import { useSession } from '../context/SessionContext';
+import { WidthProvider, Responsive } from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
 
 const productSearchTool = {
   type: "function",
@@ -32,32 +35,87 @@ const productSearchTool = {
   },
 };
 
+// Create a responsive grid layout
+const ResponsiveGridLayout = WidthProvider(Responsive);
+
 function ProductDisplay({ functionCallOutput }) {
-  console.log("ProductDisplay.INPUT", functionCallOutput);
   const { products } = JSON.parse(functionCallOutput.arguments);
   
+  const generateLayout = () => {
+    if (products.length === 1) {
+      return [{ i: '0', x: 0, y: 0, w: 12, h: 3 }];
+    }
+    
+    if (products.length === 2) {
+      return [
+        { i: '0', x: 0, y: 0, w: 6, h: 3 },
+        { i: '1', x: 6, y: 0, w: 6, h: 3 }
+      ];
+    }
+    
+    return products.map((_, index) => {
+      if (index === products.length - 1 && products.length % 2 !== 0) {
+        return { i: index.toString(), x: 0, y: Math.floor(index/2), w: 12, h: 3 };
+      }
+      return {
+        i: index.toString(),
+        x: (index % 2) * 6,
+        y: Math.floor(index/2),
+        w: 6,
+        h: 3
+      };
+    });
+  };
+
+  const layouts = {
+    lg: generateLayout(),
+    md: generateLayout(),
+    sm: products.map((_, index) => ({ 
+      i: index.toString(), 
+      x: 0, 
+      y: index, 
+      w: 12, 
+      h: 2 
+    }))
+  };
+
   return (
-    <div className="flex flex-row items-center gap-4">
-      {/* <div className="shrink-0">
-        <p className="font-bold">Customer Request</p>
-      </div> */}
-      <div className="flex-1 overflow-x-auto">
-        <div className="flex gap-4">
-          {products.map((product) => (
-            <div
-              key={product.name}
-              className="shrink-0 w-[300px] p-4 rounded-md flex items-center justify-between border border-gray-200 bg-white"
-            >
-              <img src={product.image} alt={product.name} className="w-16 h-16 object-cover rounded" />
-              <div className="flex flex-col flex-1 mx-4">
-                <p className="font-bold">{product.name}</p>
-                <p className="text-sm text-gray-600">{product.description}</p>
-              </div>
-              <p className="font-bold text-green-600">{product.price}</p>
+    <div className="w-full h-full overflow-auto">
+      <ResponsiveGridLayout
+        className="layout"
+        layouts={layouts}
+        breakpoints={{ lg: 1200, md: 996, sm: 768 }}
+        cols={{ lg: 12, md: 12, sm: 12 }}
+        rowHeight={150}
+        margin={[16, 16]}
+        isDraggable={false}
+        isResizable={false}
+        compactType="vertical"
+        containerPadding={[0, 0]}
+        autoSize={true}
+      >
+        {products.map((product, index) => (
+          <div
+            key={index.toString()}
+            className="relative group overflow-hidden rounded-lg bg-white hover:shadow-xl transition-shadow duration-300 p-4"
+          >
+            <div className="h-[50%] w-full">
+              <img 
+                src={product.image} 
+                alt={product.name} 
+                className="w-full h-full object-cover rounded-lg"
+              />
             </div>
-          ))}
-        </div>
-      </div>
+            <div className="h-[50%] flex flex-col justify-between py-4">
+              <div>
+                <h3 className="text-xl font-bold mb-2">{product.name}</h3>
+                <p className="text-gray-600 text-base line-clamp-2">{product.description}</p>
+              </div>
+              <p className="text-2xl font-bold text-green-600">{product.price}</p>
+            </div>
+          </div>
+        ))}
+      </ResponsiveGridLayout>
     </div>
   );
 }
@@ -88,12 +146,14 @@ export default function ShowProductsPanel({ isSessionActive, sendClientEvent, ev
   });
 
   return (
-    <section className="w-full">
-      <div className="bg-gray-50 rounded-md p-4">
+    <section className="w-full h-full overflow-hidden">
+      <div className="bg-gray-50 rounded-md p-4 h-full flex flex-col">
         <h2 className="text-lg font-bold mb-4">Show Products Tool</h2>
         {isSessionActive ? (
           functionCallOutput ? (
-            <ProductDisplay functionCallOutput={functionCallOutput} />
+            <div className="flex-1 overflow-auto">
+              <ProductDisplay functionCallOutput={functionCallOutput} />
+            </div>
           ) : (
             <p>Ask for product recomendations...</p>
           )

@@ -161,7 +161,7 @@ You will have tools, use them. Think of your main actions as PLP, PDF, Add to Ca
   return (
     <>
       <Hero />
-      <main className="flex flex-col">
+      <main className="flex flex-col h-screen">
         <SessionProvider sendClientEvent={sendClientEvent}>
           {/* Session Controls at the top */}
           <section className="h-48 p-4">
@@ -176,7 +176,7 @@ You will have tools, use them. Think of your main actions as PLP, PDF, Add to Ca
           </section>
           
           {/* Products and Cart Section */}
-          <section className="flex flex-col gap-4 p-4">
+          <section className="flex flex-col gap-4 p-4 flex-1 overflow-auto">
             <section className="w-full">
               <ShowProductsPanel
                 sendClientEvent={sendClientEvent}
@@ -196,9 +196,9 @@ You will have tools, use them. Think of your main actions as PLP, PDF, Add to Ca
           </section>
 
           {/* Event Log Section at the bottom */}
-          <section className="flex-1 px-4 overflow-y-auto">
+          {/* <section className="px-4">
             <EventLog events={events} />
-          </section>
+          </section> */}
         </SessionProvider>
       </main>
     </>
