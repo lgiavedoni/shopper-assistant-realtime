@@ -7,6 +7,7 @@ import ShowProductsPanel from "./ShowProductsPanel";
 import CartPanel from "./CartPanel";
 import { SessionProvider } from '../context/SessionContext';
 import catalogData from "../assets/catalog";
+import Hero from './Hero';
 
 export default function App() {
   const [isSessionActive, setIsSessionActive] = useState(false);
@@ -160,13 +161,8 @@ You will have tools, use them. Think of your main actions as PLP, PDF, Add to Ca
 
   return (
     <>
-      <nav className="absolute top-0 left-0 right-0 h-16 flex items-center">
-        <div className="flex items-center gap-4 w-full m-4 pb-2 border-0 border-b border-solid border-gray-200">
-          <img style={{ width: "24px" }} src={logo} />
-          <h1>realtime console</h1>
-        </div>
-      </nav>
-      <main className="absolute top-16 left-0 right-0 bottom-0 flex flex-col">
+      <Hero />
+      <main className="flex flex-col">
         <SessionProvider sendClientEvent={sendClientEvent}>
           {/* Session Controls at the top */}
           <section className="h-32 p-4">
