@@ -6,6 +6,7 @@ import ToolPanel from "./ToolPanel";
 import ShowProductsPanel from "./ShowProductsPanel";
 import CartPanel from "./CartPanel";
 import { SessionProvider } from '../context/SessionContext';
+import catalogData from "../assets/catalog";
 
 export default function App() {
   const [isSessionActive, setIsSessionActive] = useState(false);
@@ -42,29 +43,14 @@ export default function App() {
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
 
-    const DEFAULT_INSTRUCTIONS = `You are AI shopping assistant that works for the go-pro company,
+    const DEFAULT_INSTRUCTIONS = `You are AI shopping assistant in the ecommerce website for the go-pro company,
 Your goal is to help the user find the best products for their needs and support them in their shopping experience.
 Don't give long answers, just the answer.  Keep your answers concise and to the point.
 Don't act too much like a salesman and Don't be over the limit nice.
 If you don't know the answer, just say you don't know.
 Do not refere me to the website, just answer the question or say you don't know.
 Do not use the name of the product once is clear that we are talking about it.
-
-Here is your list of products:
-[
-  {
-    "name": "GoPro Hero 12",
-    "description": "The GoPro Hero 12 is a powerful action camera that captures stunning 5.3K video and 20MP photos.",
-    "price": "$399.99",
-    "image": "https://gppro.in/wp-content/uploads/2023/09/HERO12-1.jpg"
-  },
-  {
-    "name": "GoPro Hero 11",
-    "description": "The GoPro Hero 11 is a powerful action camera that captures stunning 5.3K video and 20MP photos.",
-    "price": "$100.99",
-    "image": "https://photolaplante.com/cdn/shop/files/Hero12004_800x.jpg?v=1694015338"
-  }
-]
+You will have tools, use them. Think of your main actions as PLP, PDF, Add to Cart, Checkout, etc.
 `;
 
     const url = new URL('https://api.openai.com/v1/realtime');
@@ -161,6 +147,13 @@ Here is your list of products:
       dataChannel.addEventListener("open", () => {
         setIsSessionActive(true);
         setEvents([]);
+        // sendClientEvent(`Here is your list of products: ${catalogData}`);
+        // sendClientEvent({
+        //   type: "response.create",
+        //   response: {
+        //     instructions: `Here is your list of products: ${catalogData}`,
+        //   },
+        // });
       });
     }
   }, [dataChannel]);
@@ -173,16 +166,32 @@ Here is your list of products:
           <h1>realtime console</h1>
         </div>
       </nav>
-      <main className="absolute top-16 left-0 right-0 bottom-0">
+      <main className="absolute top-16 left-0 right-0 bottom-0 flex flex-col">
         <SessionProvider sendClientEvent={sendClientEvent}>
-          <section className="absolute top-0 left-0 right-[760px] bottom-0 flex">
-            <section className="absolute top-0 left-0 right-0 bottom-32 px-4 overflow-y-auto">
-              <EventLog events={events} />
+          {/* Session Controls at the top */}
+          <section className="h-32 p-4">
+            <SessionControls
+              startSession={startSession}
+              stopSession={stopSession}
+              sendClientEvent={sendClientEvent}
+              sendTextMessage={sendTextMessage}
+              events={events}
+              isSessionActive={isSessionActive}
+            />
+          </section>
+          
+          {/* Products and Cart Section */}
+          <section className="flex flex-col gap-4 p-4">
+            <section className="w-full">
+              <ShowProductsPanel
+                sendClientEvent={sendClientEvent}
+                sendTextMessage={sendTextMessage}
+                events={events}
+                isSessionActive={isSessionActive}
+              />
             </section>
-            <section className="absolute h-32 left-0 right-0 bottom-0 p-4">
-              <SessionControls
-                startSession={startSession}
-                stopSession={stopSession}
+            <section className="w-full">
+              <CartPanel
                 sendClientEvent={sendClientEvent}
                 sendTextMessage={sendTextMessage}
                 events={events}
@@ -190,21 +199,10 @@ Here is your list of products:
               />
             </section>
           </section>
-          <section className="absolute top-0 w-[380px] right-[380px] bottom-0 p-4 pt-0 overflow-y-auto">
-            <ShowProductsPanel
-              sendClientEvent={sendClientEvent}
-              sendTextMessage={sendTextMessage}
-              events={events}
-              isSessionActive={isSessionActive}
-            />
-          </section>
-          <section className="absolute top-0 w-[380px] right-0 bottom-0 p-4 pt-0 overflow-y-auto">
-            <CartPanel
-              sendClientEvent={sendClientEvent}
-              sendTextMessage={sendTextMessage}
-              events={events}
-              isSessionActive={isSessionActive}
-            />
+
+          {/* Event Log Section at the bottom */}
+          <section className="flex-1 px-4 overflow-y-auto">
+            <EventLog events={events} />
           </section>
         </SessionProvider>
       </main>

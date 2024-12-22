@@ -32,18 +32,24 @@ function CartDisplay({ functionCallOutput }) {
   const { products } = JSON.parse(functionCallOutput.arguments);
   
   return (
-    <div className="flex flex-col gap-2">
-      <p>Your Cart</p>
-      {products.map((product) => (
-        <div
-          key={product.name}
-          className="w-full p-3 rounded-md flex items-center justify-between border border-gray-200 bg-white"
-        >
-          <img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded" />
-          <p className="font-bold flex-1 mx-3">{product.name}</p>
-          <p className="font-bold text-green-600">{product.price}</p>
+    <div className="flex flex-row items-center gap-4">
+      <div className="shrink-0">
+        <p className="font-bold">Your Cart</p>
+      </div>
+      <div className="flex-1 overflow-x-auto">
+        <div className="flex gap-4">
+          {products.map((product) => (
+            <div
+              key={product.name}
+              className="shrink-0 w-[250px] p-3 rounded-md flex items-center justify-between border border-gray-200 bg-white"
+            >
+              <img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded" />
+              <p className="font-bold flex-1 mx-3">{product.name}</p>
+              <p className="font-bold text-green-600">{product.price}</p>
+            </div>
+          ))}
         </div>
-      ))}
+      </div>
     </div>
   );
 }
@@ -63,9 +69,9 @@ export default function CartPanel({ isSessionActive, events }) {
   });
 
   return (
-    <section className="h-full w-full flex flex-col gap-4">
-      <div className="h-full bg-gray-50 rounded-md p-4">
-        <h2 className="text-lg font-bold">Shopping Cart</h2>
+    <section className="w-full">
+      <div className="bg-gray-50 rounded-md p-4">
+        <h2 className="text-lg font-bold mb-4">Shopping Cart</h2>
         {isSessionActive ? (
           cartProducts ? (
             <CartDisplay functionCallOutput={cartProducts} />
