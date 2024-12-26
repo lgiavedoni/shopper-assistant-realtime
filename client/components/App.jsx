@@ -227,6 +227,13 @@ export default function App() {
             )}
           </section>
         </div>
+
+        <ShowProductsPanel
+                sendClientEvent={sendClientEvent}
+                sendTextMessage={sendTextMessage}
+                events={events}
+                isSessionActive={isSessionActive}
+              />
         
       </SessionProvider>
       <div className="h-16"></div>

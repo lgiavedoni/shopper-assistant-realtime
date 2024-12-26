@@ -8,7 +8,7 @@ import 'react-resizable/css/styles.css';
 const productSearchTool = {
   type: "function",
   name: "display_products_search_results",
-  description: `Call this function every time that you are mentioning specific products to the user. 
+  description: `Call this function every time that you are mentioning specific product/s to the user. 
                 This is your PLP, Product Listing Page.
                 If the user asks for a product,category or similar, call this function.
                 If you are mentioning a product or a list of products, call this function.
@@ -28,16 +28,16 @@ const productSearchTool = {
         items: {
           type: "object",
           properties: {
-            "name": { "type": "string" },
+            "name": { "type": "string", },
             "description": { "type": "string" },
-            "price": { "type": "string" },
+            "price": { "type": "string"},
             "image": { "type": "string" },
             // "features": { "type": "string" },
           },
         },
       },
     },
-    required: ["products", "title", "product_price", "product_image"],
+    required: ["products",  "price", "image"],
   },
 };
 
@@ -103,7 +103,7 @@ function ProductDisplay({ functionCallOutput }) {
         {products.map((product, index) => (
           <div
             key={index.toString()}
-            className="relative group overflow-hidden rounded-lg bg-white hover:shadow-xl transition-shadow duration-300 p-4"
+            className="relative group overflow-hidden rounded-lg bg-white hover:shadow-xl transition-shadow duration-300 p-4 border border-gray-200"
           >
             <div 
               className="absolute inset-0 bg-center bg-no-repeat bg-contain"
