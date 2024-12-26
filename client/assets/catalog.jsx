@@ -707,7 +707,7 @@ const catalogData = `
           "id": "aace09df-d8b1-4498-b11e-3f7ff9f60d95",
           "masterData": {
             "current": {
-              "name": "Funda protectora GoPro",
+              "name": "Waterproof case for GoPro",
               "description": "Funda superprotectora y sumergible para las cámaras HERO12 Black, HERO11 Black y HERO13 Black",
               "masterVariant": {
                 "prices": [
@@ -745,7 +745,7 @@ const catalogData = `
                 ],
                 "images": [
                   {
-                    "url": "https://media.ldlc.com/r374/ld/products/00/06/07/79/LD0006077904.jpg"
+                    "url": "https://visanta.com/17369-product_540/adhesivos-para-tabla-de-surf-para-gopro.jpg"
                   }
                 ]
               }

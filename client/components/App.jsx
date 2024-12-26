@@ -11,6 +11,7 @@ import catalogData from "../assets/catalog";
 // import catalogData from "../assets/catalog_full";
 import Hero from './Hero';
 import FooterPanel from './FooterPanel';
+import CompareProductsPanel from './CompareProductsPanel';
 
 export default function App() {
   const [isSessionActive, setIsSessionActive] = useState(false);
@@ -19,6 +20,7 @@ export default function App() {
   const peerConnection = useRef(null);
   const audioElement = useRef(null);
   const [hasProductsToDisplay, setHasProductsToDisplay] = useState(false);
+  const [hasComparison, setHasComparison] = useState(false);
 
   async function startSession() {
     // Get an ephemeral key from the Fastify server
@@ -142,7 +144,7 @@ export default function App() {
       // Append new server events to the list
       dataChannel.addEventListener("message", (e) => {
         const newEvent = JSON.parse(e.data);
-        console.log("Received new event:", newEvent.type, newEvent.name, newEvent.function?.name); // Debug log
+        // console.log("Received new event:", newEvent.type, newEvent.name, newEvent.function?.name); // Debug log
         
         // Check if the event contains product display function call
         if ((newEvent.type === "function_call" && 
@@ -152,6 +154,15 @@ export default function App() {
           )
              {
           setHasProductsToDisplay(true);
+        }
+
+        // Add detection for comparison function
+        if ((newEvent.type === "function_call" && 
+            newEvent.function?.name === "display_product_comparison") ||
+            (newEvent.type === "response.function_call_arguments.done" && 
+              newEvent.name === "display_product_comparison")
+          ) {
+          setHasComparison(true);
         }
         
         setEvents((prev) => {
@@ -217,11 +228,18 @@ export default function App() {
           />
           <section className="w-full max-w-7xl mx-auto">
 
-          {(!isSessionActive || !hasProductsToDisplay) ? (
+          {(!isSessionActive || (!hasProductsToDisplay && !hasComparison)) ? (
               <HomePanel />
             ) : null}
           
           <ShowProductsPanel
+            sendClientEvent={sendClientEvent}
+            sendTextMessage={sendTextMessage}
+            events={events}
+            isSessionActive={isSessionActive}
+          />
+
+          <CompareProductsPanel
             sendClientEvent={sendClientEvent}
             sendTextMessage={sendTextMessage}
             events={events}
