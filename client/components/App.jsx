@@ -12,6 +12,7 @@ import catalogData from "../assets/catalog";
 import Hero from './Hero';
 import FooterPanel from './FooterPanel';
 import CompareProductsPanel from './CompareProductsPanel';
+import CheckoutPanel from './CheckoutPanel';
 
 export default function App() {
   const [isSessionActive, setIsSessionActive] = useState(false);
@@ -21,6 +22,7 @@ export default function App() {
   const audioElement = useRef(null);
   const [hasProductsToDisplay, setHasProductsToDisplay] = useState(false);
   const [hasComparison, setHasComparison] = useState(false);
+  const [hasCheckout, setHasCheckout] = useState(false);
 
   async function startSession() {
     // Get an ephemeral key from the Fastify server
@@ -165,6 +167,14 @@ export default function App() {
           setHasComparison(true);
         }
         
+        if ((newEvent.type === "function_call" && 
+            newEvent.function?.name === "display_checkout") ||
+            (newEvent.type === "response.function_call_arguments.done" && 
+              newEvent.name === "display_checkout")
+          ) {
+          setHasCheckout(true);
+        }
+        
         setEvents((prev) => {
           const eventExists = prev.some(event => 
             event.event_id === newEvent.event_id
@@ -228,9 +238,16 @@ export default function App() {
           />
           <section className="w-full max-w-7xl mx-auto">
 
-          {(!isSessionActive || (!hasProductsToDisplay && !hasComparison)) ? (
+          {(!hasProductsToDisplay && !hasComparison && !hasCheckout) ? (
               <HomePanel />
             ) : null}
+
+          <CheckoutPanel
+            sendClientEvent={sendClientEvent}
+            sendTextMessage={sendTextMessage}
+            events={events}
+            isSessionActive={isSessionActive}
+          />
           
           <ShowProductsPanel
             sendClientEvent={sendClientEvent}
@@ -245,6 +262,7 @@ export default function App() {
             events={events}
             isSessionActive={isSessionActive}
           />
+
           </section>
         </div>
 
