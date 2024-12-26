@@ -13,6 +13,7 @@ import Hero from './Hero';
 import FooterPanel from './FooterPanel';
 import CompareProductsPanel from './CompareProductsPanel';
 import CheckoutPanel from './CheckoutPanel';
+import OrderConfirmationPanel from './OrderConfirmationPanel';
 
 export default function App() {
   const [isSessionActive, setIsSessionActive] = useState(false);
@@ -23,6 +24,8 @@ export default function App() {
   const [hasProductsToDisplay, setHasProductsToDisplay] = useState(false);
   const [hasComparison, setHasComparison] = useState(false);
   const [hasCheckout, setHasCheckout] = useState(false);
+  const [hasOrderConfirmation, setHasOrderConfirmation] = useState(false);
+  const [activePanel, setActivePanel] = useState('home'); // 'home', 'products', 'compare', 'checkout', 'confirmation'
 
   async function startSession() {
     // Get an ephemeral key from the Fastify server
@@ -175,6 +178,14 @@ export default function App() {
           setHasCheckout(true);
         }
         
+        if ((newEvent.type === "function_call" && 
+            newEvent.function?.name === "display_order_confirmation") ||
+            (newEvent.type === "response.function_call_arguments.done" && 
+              newEvent.name === "display_order_confirmation")
+          ) {
+          setHasOrderConfirmation(true);
+        }
+        
         setEvents((prev) => {
           const eventExists = prev.some(event => 
             event.event_id === newEvent.event_id
@@ -182,6 +193,25 @@ export default function App() {
           if (eventExists) return prev;
           return [newEvent, ...prev];
         });
+
+        // Set active panel based on function calls
+        if ((newEvent.type === "function_call" || 
+            newEvent.type === "response.function_call_arguments.done")) {
+          switch (newEvent.function?.name || newEvent.name) {
+            case "display_products_search_results":
+              setActivePanel('products');
+              break;
+            case "display_product_comparison":
+              setActivePanel('compare');
+              break;
+            case "display_checkout":
+              setActivePanel('checkout');
+              break;
+            case "display_order_confirmation":
+              setActivePanel('confirmation');
+              break;
+          }
+        }
       });
 
       // Set session active when the data channel is opened
@@ -237,32 +267,45 @@ export default function App() {
             isSessionActive={isSessionActive}
           />
           <section className="w-full max-w-7xl mx-auto">
-
-          {(!hasProductsToDisplay && !hasComparison && !hasCheckout) ? (
+            <div className={activePanel === 'home' ? 'block' : 'hidden'}>
               <HomePanel />
-            ) : null}
+            </div>
+            
+            <div className={activePanel === 'checkout' && activePanel !== 'confirmation' ? 'block' : 'hidden'}>
+              <CheckoutPanel
+                sendClientEvent={sendClientEvent}
+                sendTextMessage={sendTextMessage}
+                events={events}
+                isSessionActive={isSessionActive}
+              />
+            </div>
+            
+            <div className={activePanel === 'products' ? 'block' : 'hidden'}>
+              <ShowProductsPanel
+                sendClientEvent={sendClientEvent}
+                sendTextMessage={sendTextMessage}
+                events={events}
+                isSessionActive={isSessionActive}
+              />
+            </div>
 
-          <CheckoutPanel
-            sendClientEvent={sendClientEvent}
-            sendTextMessage={sendTextMessage}
-            events={events}
-            isSessionActive={isSessionActive}
-          />
-          
-          <ShowProductsPanel
-            sendClientEvent={sendClientEvent}
-            sendTextMessage={sendTextMessage}
-            events={events}
-            isSessionActive={isSessionActive}
-          />
+            <div className={activePanel === 'compare' ? 'block' : 'hidden'}>
+              <CompareProductsPanel
+                sendClientEvent={sendClientEvent}
+                sendTextMessage={sendTextMessage}
+                events={events}
+                isSessionActive={isSessionActive}
+              />
+            </div>
 
-          <CompareProductsPanel
-            sendClientEvent={sendClientEvent}
-            sendTextMessage={sendTextMessage}
-            events={events}
-            isSessionActive={isSessionActive}
-          />
-
+            <div className={activePanel === 'confirmation' ? 'block' : 'hidden'}>
+              <OrderConfirmationPanel
+                sendClientEvent={sendClientEvent}
+                sendTextMessage={sendTextMessage}
+                events={events}
+                isSessionActive={isSessionActive}
+              />
+            </div>
           </section>
         </div>
 
