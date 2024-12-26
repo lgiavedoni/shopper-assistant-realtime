@@ -98,8 +98,8 @@ function ProductDisplay({ functionCallOutput }) {
         layouts={layouts}
         breakpoints={{ lg: 1200, md: 996, sm: 768 }}
         cols={{ lg: 12, md: 12, sm: 12 }}
-        rowHeight={150}
-        margin={[16, 16]}
+        rowHeight={100}
+        margin={[8, 8]}
         isDraggable={false}
         isResizable={false}
         compactType="vertical"
@@ -109,7 +109,7 @@ function ProductDisplay({ functionCallOutput }) {
         {products.map((product, index) => (
           <div
             key={index.toString()}
-            className="relative group overflow-hidden rounded-lg bg-white hover:shadow-xl transition-shadow duration-300 p-4 border border-gray-200"
+            className="relative group overflow-hidden rounded-lg bg-white hover:shadow-xl transition-shadow duration-300 p-2"
           >
             <div 
               className="absolute inset-0 bg-center bg-no-repeat bg-contain"
@@ -119,11 +119,11 @@ function ProductDisplay({ functionCallOutput }) {
                 zIndex: 0
               }}
             />
-            <div className="absolute bottom-4 left-4 z-10">
-              <div className="p-3 bg-white/80 rounded-lg max-w-fit">
-                <h3 className="text-xl font-bold mb-1">{product.name}</h3>
-                <p className="text-gray-600 text-sm line-clamp-2 max-w-[200px]">{product.description}</p>
-                <p className="text-2xl font-bold text-green-600 mt-1">{product.price}</p>
+            <div className="absolute bottom-2 left-2 z-10">
+              <div className="p-2 bg-white/80 rounded-lg max-w-fit">
+                <h3 className="text-base font-bold mb-1">{product.name}</h3>
+                <p className="text-gray-600 text-xs line-clamp-2 max-w-[180px]">{product.description}</p>
+                <p className="text-xl font-bold text-green-600 mt-1">{product.price}</p>
               </div>
             </div>
           </div>
