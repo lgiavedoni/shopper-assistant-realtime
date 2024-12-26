@@ -141,11 +141,15 @@ export default function App() {
       // Append new server events to the list
       dataChannel.addEventListener("message", (e) => {
         const newEvent = JSON.parse(e.data);
-        console.log("Received new event:", newEvent); // Debug log
+        console.log("Received new event:", newEvent.type, newEvent.name, newEvent.function?.name); // Debug log
         
         // Check if the event contains product display function call
-        if (newEvent.type === "function_call" && 
-            newEvent.function?.name === "display_products_search_results") {
+        if ((newEvent.type === "function_call" && 
+            newEvent.function?.name === "display_products_search_results") ||
+            (newEvent.type === "response.function_call_arguments.done" && 
+              newEvent.name === "display_products_search_results")
+          )
+             {
           setHasProductsToDisplay(true);
         }
         
@@ -210,7 +214,8 @@ export default function App() {
             isSessionActive={isSessionActive}
           />
           <section className="w-full max-w-7xl mx-auto">
-            {(!isSessionActive || !hasProductsToDisplay) ? (
+
+          {(!isSessionActive || !hasProductsToDisplay) ? (
               <HomePanel />
             ) : (
               <ShowProductsPanel

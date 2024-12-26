@@ -32,12 +32,12 @@ const productSearchTool = {
             "description": { "type": "string" },
             "price": { "type": "string" },
             "image": { "type": "string" },
-            "features": { "type": "string" },
+            // "features": { "type": "string" },
           },
         },
       },
     },
-    required: ["products", "title", "price", "image", "features"],
+    required: ["products", "title", "product_price", "product_image"],
   },
 };
 
