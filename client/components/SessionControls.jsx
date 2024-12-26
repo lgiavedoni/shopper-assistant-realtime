@@ -36,10 +36,10 @@ function SessionStopped({ startSession }) {
     <div className="flex items-center justify-center w-full h-full">
       <Button
         onClick={handleStartSession}
-        className="bg-[#2da8db] text-black px-6 py-4 rounded-full"
+        className="!bg-[#36bdf4] hover:!bg-[#36bdf4] !text-black px-6 py-4 rounded-full font-sans font-medium"
         icon={<img src="/assets/ct_favicon.png" alt="CT Logo" className="w-4 h-4" />}
       >
-        <span className="font-sans">
+        <span>
           {isActivating ? "Starting session..." : "Start voice session"}
         </span>
       </Button>
@@ -71,7 +71,7 @@ function SessionActive({ stopSession, events }) {
       <Button 
         onClick={stopSession} 
         icon={<CloudOff height={16} />}
-        className="rounded-full w-12 h-12 flex items-center justify-center bg-[#36bdf4] hover:bg-[#2da8db] text-black absolute bottom-4 right-4"
+        className="rounded-full w-12 h-12 flex items-center justify-center !bg-[#36bdf4] hover:!bg-[#36bdf4] !text-black absolute bottom-4 right-4"
       />
     </div>
   );
@@ -84,7 +84,7 @@ export default function SessionControls({
   events,
 }) {
   return (
-    <div className="flex flex-col items-center justify-center border-t-2 border-gray-200 h-32 rounded-lg shadow-lg">
+    <div className="flex flex-col items-center justify-center h-32">
       {isSessionActive ? (
         <SessionActive
           stopSession={stopSession}

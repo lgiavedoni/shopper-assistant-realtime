@@ -8,6 +8,7 @@ import CartPanel from "./CartPanel";
 import HomePanel from './HomePanel';
 import { SessionProvider } from '../context/SessionContext';
 import catalogData from "../assets/catalog";
+// import catalogData from "../assets/catalog_full";
 import Hero from './Hero';
 import FooterPanel from './FooterPanel';
 
@@ -175,7 +176,8 @@ export default function App() {
             content: [
               {
                 type: "input_text",
-                text: `here are the images for your catalog: ${catalogData}`,
+                // text: `here are the images for your catalog: ${catalogData}`,
+                text: `here is additional information about your catalog: ${catalogData}`,
               },
             ],
           },

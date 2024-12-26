@@ -13,7 +13,8 @@ const productSearchTool = {
                 If the user asks for a product,category or similar, call this function.
                 If you are mentioning a product or a list of products, call this function.
                 If you are mentioning some recommendations, call this function.
-                If a function returns a product or many products, call this function.`,
+                If a function returns a product or many products, call this function.
+                Include the price in the product object. If you don't have the exact price use your best guess.`,
   parameters: {
     type: "object",
     strict: true,
