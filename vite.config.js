@@ -8,6 +8,7 @@ const path = fileURLToPath(import.meta.url);
 
 export default {
   root: join(dirname(path), "client"),
+  publicDir: join(dirname(path), "public"),
   plugins: [viteReact(), viteFastifyReact()],
   ssr: {
     external: ["use-sync-external-store"],

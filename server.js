@@ -1,5 +1,12 @@
 import Fastify from "fastify";
 import FastifyVite from "@fastify/vite";
+import dotenv from 'dotenv';
+dotenv.config();
+
+// Add this validation after dotenv.config()
+if (!process.env.OPENAI_API_KEY) {
+  throw new Error('OPENAI_API_KEY is required in .env file');
+}
 
 // Fastify + React + Vite configuration
 const server = Fastify({

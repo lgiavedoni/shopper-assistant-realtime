@@ -5,9 +5,11 @@ import SessionControls from "./SessionControls";
 import ToolPanel from "./ToolPanel";
 import ShowProductsPanel from "./ShowProductsPanel";
 import CartPanel from "./CartPanel";
+import HomePanel from './HomePanel';
 import { SessionProvider } from '../context/SessionContext';
 import catalogData from "../assets/catalog";
 import Hero from './Hero';
+import FooterPanel from './FooterPanel';
 
 export default function App() {
   const [isSessionActive, setIsSessionActive] = useState(false);
@@ -20,7 +22,12 @@ export default function App() {
     // Get an ephemeral key from the Fastify server
     const tokenResponse = await fetch("/token");
     const data = await tokenResponse.json();
-    const EPHEMERAL_KEY = data.client_secret.value;
+    const EPHEMERAL_KEY = data.value || data.client_secret?.value;
+
+    if (!EPHEMERAL_KEY) {
+      console.error('Failed to get valid token from server');
+      return;
+    }
 
     // Create a peer connection
     const pc = new RTCPeerConnection();
@@ -148,59 +155,62 @@ You will have tools, use them. Think of your main actions as PLP, PDF, Add to Ca
         setIsSessionActive(true);
         setEvents([]);
         // sendClientEvent(`Here is your list of products: ${catalogData}`);
-        // sendClientEvent({
-        //   type: "response.create",
-        //   response: {
-        //     instructions: `Here is your list of products: ${catalogData}`,
-        //   },
-        // });
+        sendClientEvent({
+          type: "conversation.item.create",
+          item: {
+            type: "message",
+            role: "system",
+            content: [
+              {
+                type: "input_text",
+                text: `here are the images for your catalog: ${catalogData}`,
+              },
+            ],
+          },
+        });
       });
     }
   }, [dataChannel]);
 
   return (
-    <>
+    <main className="min-h-screen w-full overflow-y-auto">
       <Hero />
-      <main className="flex flex-col h-screen">
-        <SessionProvider sendClientEvent={sendClientEvent}>
-          {/* Session Controls at the top */}
-          <section className="h-48 p-4">
-            <SessionControls
-              startSession={startSession}
-              stopSession={stopSession}
-              sendClientEvent={sendClientEvent}
-              sendTextMessage={sendTextMessage}
-              events={events}
-              isSessionActive={isSessionActive}
-            />
-          </section>
-          
-          {/* Products and Cart Section */}
-          <section className="flex flex-col gap-4 p-4 flex-1 overflow-auto">
-            <section className="w-full">
+      <SessionProvider sendClientEvent={sendClientEvent}>
+        <section className="p-2 sm:p-4">
+          <SessionControls
+            startSession={startSession}
+            stopSession={stopSession}
+            sendClientEvent={sendClientEvent}
+            sendTextMessage={sendTextMessage}
+            events={events}
+            isSessionActive={isSessionActive}
+          />
+        </section>
+        
+        <div className="p-2 sm:p-4 space-y-2 sm:space-y-4">
+          <CartPanel
+            sendClientEvent={sendClientEvent}
+            sendTextMessage={sendTextMessage}
+            events={events}
+            isSessionActive={isSessionActive}
+          />
+          <section className="w-full max-w-7xl mx-auto">
+            {!isSessionActive ? (
+              <HomePanel />
+            ) : (
               <ShowProductsPanel
                 sendClientEvent={sendClientEvent}
                 sendTextMessage={sendTextMessage}
                 events={events}
                 isSessionActive={isSessionActive}
               />
-            </section>
-            <section className="w-full">
-              <CartPanel
-                sendClientEvent={sendClientEvent}
-                sendTextMessage={sendTextMessage}
-                events={events}
-                isSessionActive={isSessionActive}
-              />
-            </section>
+            )}
           </section>
-
-          {/* Event Log Section at the bottom */}
-          {/* <section className="px-4">
-            <EventLog events={events} />
-          </section> */}
-        </SessionProvider>
-      </main>
-    </>
+        </div>
+        
+      </SessionProvider>
+      <div className="h-16"></div>
+      <FooterPanel />
+    </main>
   );
 }

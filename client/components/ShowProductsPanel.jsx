@@ -4,6 +4,7 @@ import { useSession } from '../context/SessionContext';
 import { WidthProvider, Responsive } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
+import HomePanel from './HomePanel';
 
 const productSearchTool = {
   type: "function",
@@ -17,6 +18,10 @@ const productSearchTool = {
     type: "object",
     strict: true,
     properties: {
+      title: {
+        type: "string",
+        description: "The title of the products to display. For example: 'Accessories for your Hero 11 camera'",
+      },
       products: {
         type: "array",
         description: "Array of 1 or more products.",
@@ -27,11 +32,12 @@ const productSearchTool = {
             "description": { "type": "string" },
             "price": { "type": "string" },
             "image": { "type": "string" },
+            "features": { "type": "string" },
           },
         },
       },
     },
-    required: ["products"],
+    required: ["products", "title"],
   },
 };
 
@@ -39,7 +45,7 @@ const productSearchTool = {
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 function ProductDisplay({ functionCallOutput }) {
-  const { products } = JSON.parse(functionCallOutput.arguments);
+  const { products, title } = JSON.parse(functionCallOutput.arguments);
   
   const generateLayout = () => {
     if (products.length === 1) {
@@ -99,19 +105,20 @@ function ProductDisplay({ functionCallOutput }) {
             key={index.toString()}
             className="relative group overflow-hidden rounded-lg bg-white hover:shadow-xl transition-shadow duration-300 p-4"
           >
-            <div className="h-[50%] w-full">
-              <img 
-                src={product.image} 
-                alt={product.name} 
-                className="w-full h-full object-cover rounded-lg"
-              />
-            </div>
-            <div className="h-[50%] flex flex-col justify-between py-4">
-              <div>
-                <h3 className="text-xl font-bold mb-2">{product.name}</h3>
-                <p className="text-gray-600 text-base line-clamp-2">{product.description}</p>
+            <div 
+              className="absolute inset-0 bg-center bg-no-repeat bg-contain"
+              style={{
+                backgroundImage: `url(${product.image})`,
+                backgroundPosition: 'center',
+                zIndex: 0
+              }}
+            />
+            <div className="absolute bottom-4 left-4 z-10">
+              <div className="p-3 bg-white/80 rounded-lg max-w-fit">
+                <h3 className="text-xl font-bold mb-1">{product.name}</h3>
+                <p className="text-gray-600 text-sm line-clamp-2 max-w-[200px]">{product.description}</p>
+                <p className="text-2xl font-bold text-green-600 mt-1">{product.price}</p>
               </div>
-              <p className="text-2xl font-bold text-green-600">{product.price}</p>
             </div>
           </div>
         ))}
@@ -148,14 +155,18 @@ export default function ShowProductsPanel({ isSessionActive, sendClientEvent, ev
   return (
     <section className="w-full h-full overflow-hidden">
       <div className="bg-gray-50 rounded-md p-4 h-full flex flex-col">
-        <h2 className="text-lg font-bold mb-4">Show Products Tool</h2>
         {isSessionActive ? (
           functionCallOutput ? (
-            <div className="flex-1 overflow-auto">
-              <ProductDisplay functionCallOutput={functionCallOutput} />
-            </div>
+            <>
+              <h2 className="text-lg font-bold mb-4">
+                {JSON.parse(functionCallOutput.arguments).title}
+              </h2>
+              <div className="flex-1 overflow-auto">
+                <ProductDisplay functionCallOutput={functionCallOutput} />
+              </div>
+            </>
           ) : (
-            <p>Ask for product recomendations...</p>
+            <HomePanel />
           )
         ) : (
           <p>Start the session to use this tool...</p>

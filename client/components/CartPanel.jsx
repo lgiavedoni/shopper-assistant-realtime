@@ -24,28 +24,45 @@ const cartTool = {
         },
       },
     },
-    required: ["products"],
+    required: ["products","image","price"],
   },
 };
 
 function CartDisplay({ functionCallOutput }) {
-  const { products } = JSON.parse(functionCallOutput.arguments);
+  let products = [];
+  
+  try {
+    const parsedData = JSON.parse(functionCallOutput.arguments);
+    products = parsedData.products;
+  } catch (error) {
+    console.error('Error parsing cart data:', error);
+    console.log('Failed to parse:', functionCallOutput.arguments);
+    return <p>Error loading cart data</p>;
+  }
   
   return (
-    <div className="flex flex-row items-center gap-4">
-      <div className="shrink-0">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      <div className="shrink-0 w-full sm:w-auto mb-2 sm:mb-0">
         <p className="font-bold">Your Cart</p>
       </div>
-      <div className="flex-1 overflow-x-auto">
-        <div className="flex gap-4">
+      <div className="flex-1 w-full overflow-x-auto">
+        <div className="flex flex-col sm:flex-row gap-4">
           {products.map((product) => (
             <div
               key={product.name}
-              className="shrink-0 w-[250px] p-3 rounded-md flex items-center justify-between border border-gray-200 bg-white"
+              className="w-full sm:w-[250px] sm:shrink-0 p-3 rounded-md flex items-center justify-between border border-gray-200 bg-white"
             >
-              <img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded" />
-              <p className="font-bold flex-1 mx-3">{product.name}</p>
-              <p className="font-bold text-green-600">{product.price}</p>
+              <img 
+                src={product.image || '/assets/not_found_icon.jpg'} 
+                alt={product.name} 
+                className="w-12 h-12 object-cover rounded"
+                onError={(e) => {
+                  e.target.src = '/assets/not_found_icon.jpg';
+                  e.target.onerror = null;
+                }}
+              />
+              <p className="font-bold flex-1 mx-3 truncate">{product.name}</p>
+              <p className="font-bold text-green-600 shrink-0">{product.price}</p>
             </div>
           ))}
         </div>
@@ -69,9 +86,8 @@ export default function CartPanel({ isSessionActive, events }) {
   });
 
   return (
-    <section className="w-full">
-      <div className="bg-gray-50 rounded-md p-4">
-        <h2 className="text-lg font-bold mb-4">Shopping Cart</h2>
+    <section className="w-full max-w-7xl mx-auto">
+      <div className="bg-gray-50 rounded-md p-4 h-full flex flex-col">
         {isSessionActive ? (
           cartProducts ? (
             <CartDisplay functionCallOutput={cartProducts} />
