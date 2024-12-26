@@ -217,24 +217,17 @@ export default function App() {
 
           {(!isSessionActive || !hasProductsToDisplay) ? (
               <HomePanel />
-            ) : (
-              <ShowProductsPanel
-                sendClientEvent={sendClientEvent}
-                sendTextMessage={sendTextMessage}
-                events={events}
-                isSessionActive={isSessionActive}
-              />
-            )}
+            ) : null}
+          
+          <ShowProductsPanel
+            sendClientEvent={sendClientEvent}
+            sendTextMessage={sendTextMessage}
+            events={events}
+            isSessionActive={isSessionActive}
+          />
           </section>
         </div>
 
-        <ShowProductsPanel
-                sendClientEvent={sendClientEvent}
-                sendTextMessage={sendTextMessage}
-                events={events}
-                isSessionActive={isSessionActive}
-              />
-        
       </SessionProvider>
       <div className="h-16"></div>
       <FooterPanel />

@@ -7,6 +7,7 @@ export function SessionProvider({ children, sendClientEvent }) {
   const [tools, setTools] = useState({});
   
   const registerTool = useCallback((toolDefinition) => {
+    console.log("registerTool", toolDefinition.name, toolDefinition);
     setTools(prev => ({
       ...prev,
       [toolDefinition.name]: toolDefinition
@@ -15,6 +16,7 @@ export function SessionProvider({ children, sendClientEvent }) {
 
   const updateSession = useCallback(() => {
     if (!functionAdded && Object.keys(tools).length > 0) {
+      console.log("updateSession", tools);
       sendClientEvent({
         type: "session.update",
         session: {

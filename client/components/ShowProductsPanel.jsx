@@ -47,6 +47,11 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 function ProductDisplay({ functionCallOutput }) {
   const { products, title } = JSON.parse(functionCallOutput.arguments);
   
+  // Return null if no products
+  if (!products || products.length === 0) {
+    return null;
+  }
+
   const generateLayout = () => {
     if (products.length === 1) {
       return [{ i: '0', x: 0, y: 0, w: 12, h: 3 }];
@@ -152,23 +157,20 @@ export default function ShowProductsPanel({ isSessionActive, sendClientEvent, ev
     }
   });
 
+  // Don't render anything if there are no products
+  if (!functionCallOutput || !JSON.parse(functionCallOutput.arguments).products?.length) {
+    return null;
+  }
+
   return (
     <section className="w-full h-full overflow-hidden">
       <div className="bg-gray-50 rounded-md p-4 h-full flex flex-col">
         <h2 className="text-lg font-bold mb-4">
-          {functionCallOutput ? JSON.parse(functionCallOutput.arguments).title : "Products"}
+          {JSON.parse(functionCallOutput.arguments).title}
         </h2>
-        {isSessionActive ? (
-          functionCallOutput ? (
-            <div className="flex-1 overflow-auto">
-              <ProductDisplay functionCallOutput={functionCallOutput} />
-            </div>
-          ) : (
-            <p>Ask for product recomendations...</p>
-          )
-        ) : (
-          <p>Start the session to use this tool...</p>
-        )}
+        <div className="flex-1 overflow-auto">
+          <ProductDisplay functionCallOutput={functionCallOutput} />
+        </div>
       </div>
     </section>
   );
