@@ -4,7 +4,6 @@ import { useSession } from '../context/SessionContext';
 import { WidthProvider, Responsive } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
-import HomePanel from './HomePanel';
 
 const productSearchTool = {
   type: "function",
@@ -13,6 +12,7 @@ const productSearchTool = {
                 This is your PLP, Product Listing Page.
                 If the user asks for a product,category or similar, call this function.
                 If you are mentioning a product or a list of products, call this function.
+                If you are mentioning some recommendations, call this function.
                 If a function returns a product or many products, call this function.`,
   parameters: {
     type: "object",
@@ -37,7 +37,7 @@ const productSearchTool = {
         },
       },
     },
-    required: ["products", "title"],
+    required: ["products", "title", "price", "image", "features"],
   },
 };
 
@@ -155,18 +155,16 @@ export default function ShowProductsPanel({ isSessionActive, sendClientEvent, ev
   return (
     <section className="w-full h-full overflow-hidden">
       <div className="bg-gray-50 rounded-md p-4 h-full flex flex-col">
+        <h2 className="text-lg font-bold mb-4">
+          {functionCallOutput ? JSON.parse(functionCallOutput.arguments).title : "Products"}
+        </h2>
         {isSessionActive ? (
           functionCallOutput ? (
-            <>
-              <h2 className="text-lg font-bold mb-4">
-                {JSON.parse(functionCallOutput.arguments).title}
-              </h2>
-              <div className="flex-1 overflow-auto">
-                <ProductDisplay functionCallOutput={functionCallOutput} />
-              </div>
-            </>
+            <div className="flex-1 overflow-auto">
+              <ProductDisplay functionCallOutput={functionCallOutput} />
+            </div>
           ) : (
-            <HomePanel />
+            <p>Ask for product recomendations...</p>
           )
         ) : (
           <p>Start the session to use this tool...</p>

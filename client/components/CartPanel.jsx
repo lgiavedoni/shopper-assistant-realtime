@@ -85,18 +85,18 @@ export default function CartPanel({ isSessionActive, events }) {
     processedFlag: 'processedCart'
   });
 
+  // Check if cart has products
+  const hasProducts = cartProducts && JSON.parse(cartProducts.arguments).products.length > 0;
+
+  // Don't render anything if there are no products or session isn't active
+  if (!isSessionActive || !hasProducts) {
+    return null;
+  }
+
   return (
     <section className="w-full max-w-7xl mx-auto">
       <div className="bg-gray-50 rounded-md p-4 h-full flex flex-col">
-        {isSessionActive ? (
-          cartProducts ? (
-            <CartDisplay functionCallOutput={cartProducts} />
-          ) : (
-            <p>Your Cart is empty...</p>
-          )
-        ) : (
-          <p>Start the session to use this tool...</p>
-        )}
+        <CartDisplay functionCallOutput={cartProducts} />
       </div>
     </section>
   );

@@ -17,6 +17,7 @@ export default function App() {
   const [dataChannel, setDataChannel] = useState(null);
   const peerConnection = useRef(null);
   const audioElement = useRef(null);
+  const [hasProductsToDisplay, setHasProductsToDisplay] = useState(false);
 
   async function startSession() {
     // Get an ephemeral key from the Fastify server
@@ -52,14 +53,15 @@ export default function App() {
     await pc.setLocalDescription(offer);
 
     const DEFAULT_INSTRUCTIONS = `You are AI shopping assistant in the ecommerce website for the go-pro company,
-Your goal is to help the user find the best products for their needs and support them in their shopping experience.
-Don't give long answers, just the answer.  Keep your answers concise and to the point.
-Don't act too much like a salesman and Don't be over the limit nice.
-If you don't know the answer, just say you don't know.
-Do not refere me to the website, just answer the question or say you don't know.
-Do not use the name of the product once is clear that we are talking about it.
-You will have tools, use them. Think of your main actions as PLP, PDF, Add to Cart, Checkout, etc.
-`;
+    Your goal is to help the user find the best products for their needs and support them in their shopping experience.
+    Don't give long answers, just the answer.  Keep your answers concise and to the point.
+    Don't act too much like a salesman and Don't be over the limit nice.
+    If you don't know the answer, just say you don't know.
+    Do not refere me to the website, just answer the question or say you don't know.
+    Do not use the name of the product once is clear that we are talking about it.
+    
+    You will have tools, use them. Think of your main actions as PLP, PDF, Add to Cart, Checkout, etc.
+    `;
 
     const url = new URL('https://api.openai.com/v1/realtime');
     url.searchParams.set('model', 'gpt-4o-realtime-preview-2024-12-17');
@@ -141,6 +143,12 @@ You will have tools, use them. Think of your main actions as PLP, PDF, Add to Ca
         const newEvent = JSON.parse(e.data);
         console.log("Received new event:", newEvent); // Debug log
         
+        // Check if the event contains product display function call
+        if (newEvent.type === "function_call" && 
+            newEvent.function?.name === "display_products_search_results") {
+          setHasProductsToDisplay(true);
+        }
+        
         setEvents((prev) => {
           const eventExists = prev.some(event => 
             event.event_id === newEvent.event_id
@@ -168,6 +176,11 @@ You will have tools, use them. Think of your main actions as PLP, PDF, Add to Ca
             ],
           },
         });
+
+        //Converstation starter
+        sendTextMessage("hi");
+
+        
       });
     }
   }, [dataChannel]);
@@ -177,14 +190,16 @@ You will have tools, use them. Think of your main actions as PLP, PDF, Add to Ca
       <Hero />
       <SessionProvider sendClientEvent={sendClientEvent}>
         <section className="p-2 sm:p-4">
-          <SessionControls
-            startSession={startSession}
-            stopSession={stopSession}
-            sendClientEvent={sendClientEvent}
-            sendTextMessage={sendTextMessage}
-            events={events}
-            isSessionActive={isSessionActive}
-          />
+          <div className="w-full max-w-7xl mx-auto">
+            <SessionControls
+              startSession={startSession}
+              stopSession={stopSession}
+              sendClientEvent={sendClientEvent}
+              sendTextMessage={sendTextMessage}
+              events={events}
+              isSessionActive={isSessionActive}
+            />
+          </div>
         </section>
         
         <div className="p-2 sm:p-4 space-y-2 sm:space-y-4">
@@ -195,7 +210,7 @@ You will have tools, use them. Think of your main actions as PLP, PDF, Add to Ca
             isSessionActive={isSessionActive}
           />
           <section className="w-full max-w-7xl mx-auto">
-            {!isSessionActive ? (
+            {(!isSessionActive || !hasProductsToDisplay) ? (
               <HomePanel />
             ) : (
               <ShowProductsPanel
