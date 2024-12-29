@@ -149,7 +149,10 @@ export default function App() {
       // Append new server events to the list
       dataChannel.addEventListener("message", (e) => {
         const newEvent = JSON.parse(e.data);
-        // console.log("Received new event:", newEvent.type, newEvent.name, newEvent.function?.name); // Debug log
+        // console.log("Received new event:", newEvent.type, newEvent.name, newEvent.function?.name, newEvent); // Debug log
+        if(newEvent.response.status === "failed") {
+          console.log("Failed event:", newEvent);
+        }
         
         // Check if the event contains product display function call
         if ((newEvent.type === "function_call" && 
