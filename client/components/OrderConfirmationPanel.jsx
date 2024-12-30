@@ -91,14 +91,14 @@ export default function OrderConfirmationPanel({ isSessionActive, sendClientEven
     isSessionActive,
     events,
     processedFlag: 'processedOrderConfirmation',
-    // afterFunctionCall: () => {
-    //   sendClientEvent({
-    //     type: "response.create",
-    //     response: {
-    //       instructions: "clear the cart and call any other tools that are needed",
-    //     },
-    //   });
-    // }
+    afterFunctionCall: () => {
+      sendClientEvent({
+        type: "response.create",
+        response: {
+          instructions: "Congratulate the customer on their purchase and ask for feedback.",
+        },
+      });
+    }
   });
 
   if (!functionCallOutput) return null;

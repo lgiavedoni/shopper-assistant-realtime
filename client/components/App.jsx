@@ -67,6 +67,9 @@ export default function App() {
     If you don't know the answer, just say you don't know.
     Do not refere me to the website, just answer the question or say you don't know.
     Do not use the name of the product once is clear that we are talking about it.
+
+    Additiona context:
+    - commercetools valencia office address: C. del Pintor Sorolla, 5, planta 6, Ciutat Vella, 46002 València, Valencia
     
     You will have tools, use them. Think of your main actions as PLP, PDF, Add to Cart, Checkout, etc.
     `;
@@ -110,17 +113,15 @@ export default function App() {
 
   // Send a message to the model
   function sendClientEvent(message) {
-    console.log("sendClientEvent", message);
-    if (dataChannel) {
-      message.event_id = message.event_id || crypto.randomUUID();
-      dataChannel.send(JSON.stringify(message));
-      setEvents((prev) => [message, ...prev]);
-    } else {
-      console.error(
-        "Failed to send message - no data channel available",
-        message,
-      );
+    if (!dataChannel || dataChannel.readyState !== "open") {
+      console.warn("Data channel not ready - message queued:", message);
+      // Optionally queue the message for later or handle the error state
+      return;
     }
+
+    message.event_id = message.event_id || crypto.randomUUID();
+    dataChannel.send(JSON.stringify(message));
+    setEvents((prev) => [message, ...prev]);
   }
 
   // Send a text message to the model
@@ -146,11 +147,35 @@ export default function App() {
   // Attach event listeners to the data channel when a new one is created
   useEffect(() => {
     if (dataChannel) {
+      // Wait for data channel to be ready before sending initial messages
+      dataChannel.addEventListener("open", () => {
+        setIsSessionActive(true);
+        setEvents([]);
+        
+        // Send catalog data
+        sendClientEvent({
+          type: "conversation.item.create",
+          item: {
+            type: "message",
+            role: "system",
+            content: [
+              {
+                type: "input_text",
+                text: `here is additional information about your catalog: ${catalogData}`,
+              },
+            ],
+          },
+        });
+
+        // Start conversation
+        sendTextMessage("hi");
+      });
+
       // Append new server events to the list
       dataChannel.addEventListener("message", (e) => {
         const newEvent = JSON.parse(e.data);
         // console.log("Received new event:", newEvent.type, newEvent.name, newEvent.function?.name, newEvent); // Debug log
-        if(newEvent.response.status === "failed") {
+        if(newEvent.response?.status === "failed") {
           console.log("Failed event:", newEvent);
         }
         
@@ -216,32 +241,6 @@ export default function App() {
           }
         }
       });
-
-      // Set session active when the data channel is opened
-      dataChannel.addEventListener("open", () => {
-        setIsSessionActive(true);
-        setEvents([]);
-        // sendClientEvent(`Here is your list of products: ${catalogData}`);
-        sendClientEvent({
-          type: "conversation.item.create",
-          item: {
-            type: "message",
-            role: "system",
-            content: [
-              {
-                type: "input_text",
-                // text: `here are the images for your catalog: ${catalogData}`,
-                text: `here is additional information about your catalog: ${catalogData}`,
-              },
-            ],
-          },
-        });
-
-        //Converstation starter
-        sendTextMessage("hi");
-
-        
-      });
     }
   }, [dataChannel]);
 
@@ -263,18 +262,21 @@ export default function App() {
         </section>
         
         <div className="p-2 sm:p-4 space-y-2 sm:space-y-4">
-          <CartPanel
-            sendClientEvent={sendClientEvent}
-            sendTextMessage={sendTextMessage}
-            events={events}
-            isSessionActive={isSessionActive}
-          />
-          <section className="w-full max-w-7xl mx-auto">
-            <div className={activePanel === 'home' ? 'block' : 'hidden'}>
+          <div className={`${activePanel !== 'confirmation' ? 'block' : 'hidden'}`}>
+            <CartPanel
+              sendClientEvent={sendClientEvent}
+              sendTextMessage={sendTextMessage}
+              events={events}
+              isSessionActive={isSessionActive}
+            />
+            <br />
+          </div>
+          <section className="w-full max-w-7xl mx-auto space-y-2 sm:space-y-4">
+            <div className={`${activePanel === 'home' ? 'block' : 'hidden'}`}>
               <HomePanel />
             </div>
             
-            <div className={activePanel === 'checkout' && activePanel !== 'confirmation' ? 'block' : 'hidden'}>
+            <div className={`${activePanel === 'checkout' && activePanel !== 'confirmation' ? 'block' : 'hidden'}`}>
               <CheckoutPanel
                 sendClientEvent={sendClientEvent}
                 sendTextMessage={sendTextMessage}
@@ -283,7 +285,7 @@ export default function App() {
               />
             </div>
             
-            <div className={activePanel === 'products' ? 'block' : 'hidden'}>
+            <div className={`${activePanel === 'products' ? 'block' : 'hidden'}`}>
               <ShowProductsPanel
                 sendClientEvent={sendClientEvent}
                 sendTextMessage={sendTextMessage}
@@ -292,7 +294,7 @@ export default function App() {
               />
             </div>
 
-            <div className={activePanel === 'compare' ? 'block' : 'hidden'}>
+            <div className={`${activePanel === 'compare' ? 'block' : 'hidden'}`}>
               <CompareProductsPanel
                 sendClientEvent={sendClientEvent}
                 sendTextMessage={sendTextMessage}
@@ -301,7 +303,7 @@ export default function App() {
               />
             </div>
 
-            <div className={activePanel === 'confirmation' ? 'block' : 'hidden'}>
+            <div className={`${activePanel === 'confirmation' ? 'block' : 'hidden'}`}>
               <OrderConfirmationPanel
                 sendClientEvent={sendClientEvent}
                 sendTextMessage={sendTextMessage}

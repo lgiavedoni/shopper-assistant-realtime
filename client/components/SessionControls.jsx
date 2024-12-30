@@ -6,11 +6,11 @@ function VoiceVisualizer({ isListening }) {
   const bubbles = Array(4).fill(null);
   
   return (
-    <div className="flex items-center justify-center gap-4 mb-4">
+    <div className="flex items-center justify-center gap-2">
       {bubbles.map((_, i) => (
         <div
           key={i}
-          className={`w-8 h-8 bg-[#36bdf4] rounded-full transition-all duration-200 ${
+          className={`w-6 h-6 bg-[#36bdf4] rounded-full transition-all duration-200 ${
             isListening ? 'animate-bounce' : ''
           }`}
           style={{
@@ -66,7 +66,7 @@ function SessionActive({ stopSession, events }) {
   }, [events]);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full relative">
+    <div className="flex flex-col items-center justify-end w-full h-full relative pb-4">
       <VoiceVisualizer isListening={isListening} />
       <Button 
         onClick={stopSession} 
@@ -84,7 +84,7 @@ export default function SessionControls({
   events,
 }) {
   return (
-    <div className="flex flex-col items-center justify-center h-32">
+    <div className="flex flex-col items-center justify-end h-16">
       {isSessionActive ? (
         <SessionActive
           stopSession={stopSession}

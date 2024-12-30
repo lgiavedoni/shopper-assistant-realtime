@@ -165,12 +165,14 @@ export default function ShowProductsPanel({ isSessionActive, sendClientEvent, ev
 
   return (
     <section className="w-full h-full overflow-hidden">
-      <div className="bg-gray-50 rounded-md p-4 h-full flex flex-col">
-        <h2 className="text-lg font-bold mb-4">
-          {JSON.parse(functionCallOutput.arguments).title}
-        </h2>
-        <div className="flex-1 overflow-auto">
-          <ProductDisplay functionCallOutput={functionCallOutput} />
+      <div className="border border-gray-200 shadow-lg rounded-lg overflow-hidden">
+        <div className="bg-gray-50 p-4 h-full flex flex-col">
+          <h2 className="text-lg font-bold mb-4">
+            {JSON.parse(functionCallOutput.arguments).title}
+          </h2>
+          <div className="flex-1 overflow-auto">
+            <ProductDisplay functionCallOutput={functionCallOutput} />
+          </div>
         </div>
       </div>
     </section>
