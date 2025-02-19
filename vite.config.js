@@ -10,11 +10,6 @@ export default {
   root: join(dirname(path), "client"),
   publicDir: join(dirname(path), "public"),
   plugins: [viteReact(), viteFastifyReact()],
-  build: {
-    outDir: '../dist',
-    emptyOutDir: true,
-    sourcemap: true
-  },
   ssr: {
     external: ["use-sync-external-store"],
     noExternal: ['@googlemaps/js-api-loader']
