@@ -1,7 +1,12 @@
 import Fastify from "fastify";
 import FastifyVite from "@fastify/vite";
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
 dotenv.config();
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Add this validation after dotenv.config()
 if (!process.env.OPENAI_API_KEY) {
@@ -17,14 +22,23 @@ const server = Fastify({
   },
 });
 
-await server.register(FastifyVite, {
-  root: import.meta.url,
-  renderer: "@fastify/react",
-});
+// Configure Vite differently for production
+const isProd = process.env.NODE_ENV === 'production';
 
-await server.vite.ready();
-
-
+if (isProd) {
+  // Serve static files from dist directory in production
+  await server.register(import('@fastify/static'), {
+    root: join(__dirname, 'dist'),
+    prefix: '/'
+  });
+} else {
+  // Development mode with Vite
+  await server.register(FastifyVite, {
+    root: import.meta.url,
+    renderer: "@fastify/react",
+  });
+  await server.vite.ready();
+}
 
 // Server-side API route to return an ephemeral realtime session token
 server.get("/token", async () => {
@@ -48,4 +62,4 @@ server.get("/token", async () => {
   });
 });
 
-await server.listen({ port: process.env.PORT || 3000 });
+await server.listen({ port: process.env.PORT || 3000, host: '0.0.0.0' });
