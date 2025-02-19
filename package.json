@@ -4,7 +4,8 @@
     "dev": "node server.js --dev",
     "start": "node server.js",
     "build": "vite build",
-    "preview": "vite preview",
+    "build:client": "vite build --outDir dist/client --ssrManifest",
+    "build:server": "vite build --outDir dist/server --ssr /index.js",
     "devinstall": "zx ../../devinstall.mjs -- node server.js --dev",
     "lint": "eslint . --ext .js,.jsx --fix"
   },
